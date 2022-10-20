@@ -6,6 +6,7 @@
 import logging
 import os
 import stat
+import shutil
 import sys
 from io import BytesIO
 from pathlib import Path
@@ -50,6 +51,7 @@ chromiumExecutable = {
     'mac': (DOWNLOADS_FOLDER / REVISION / 'chrome-mac' / 'Chromium.app' / 'Contents' / 'MacOS' / 'Chromium'),
     'win32': DOWNLOADS_FOLDER / REVISION / windowsArchive / 'chrome.exe',
     'win64': DOWNLOADS_FOLDER / REVISION / windowsArchive / 'chrome.exe',
+    'openbsd': os.environ.get('chromium_executable'),
 }
 
 
@@ -63,6 +65,12 @@ def current_platform() -> str:
         if sys.maxsize > 2 ** 31 - 1:
             return 'win64'
         return 'win32'
+    elif sys.platform.startswith('openbsd'):
+        if shutil.which('chrome'):
+            executablePath = os.environ.setdefault('chromium_executable', shutil.which('chrome'))
+        else:
+            raise OSERROR('Unsupported system configuration: ' + sys.platform)
+        return 'openbsd'
     raise OSError('Unsupported platform: ' + sys.platform)
 
 
