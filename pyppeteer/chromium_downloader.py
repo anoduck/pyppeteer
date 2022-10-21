@@ -67,7 +67,7 @@ def current_platform() -> str:
         return 'win32'
     elif sys.platform.startswith('openbsd'):
         if shutil.which('chrome'):
-            executablePath = os.environ.setdefault('chromium_executable', shutil.which('chrome'))
+            os.environ('chromium_executable') = shutil.which('chrome')
         else:
             raise OSERROR('Unsupported system configuration: ' + sys.platform)
         return 'openbsd'
