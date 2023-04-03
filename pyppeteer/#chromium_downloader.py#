@@ -25,10 +25,6 @@ handler.setLevel(logging.INFO)
 logger.setLevel(logging.INFO)
 logger.addHandler(handler)
 
-# Variables for OpenBSD
-PREFIX = sys.prefix
-BIN_FOLDER = Path(PREFIX) / 'bin'
-
 DOWNLOADS_FOLDER = Path(__pyppeteer_home__) / 'local-chromium'
 DEFAULT_DOWNLOAD_HOST = 'https://storage.googleapis.com'
 DOWNLOAD_HOST = os.environ.get('PYPPETEER_DOWNLOAD_HOST', DEFAULT_DOWNLOAD_HOST)
@@ -55,7 +51,7 @@ chromiumExecutable = {
     'mac': (DOWNLOADS_FOLDER / REVISION / 'chrome-mac' / 'Chromium.app' / 'Contents' / 'MacOS' / 'Chromium'),
     'win32': DOWNLOADS_FOLDER / REVISION / windowsArchive / 'chrome.exe',
     'win64': DOWNLOADS_FOLDER / REVISION / windowsArchive / 'chrome.exe',
-    'openbsd': BIN_FOLDER / 'chrome',
+    'openbsd': shutil.which('chrome'),
 }
 
 def current_platform() -> str:
@@ -69,6 +65,7 @@ def current_platform() -> str:
             return 'win64'
         return 'win32'
     elif sys.platform.startswith('openbsd'):
+        if shu
         return 'openbsd'
     raise OSError('Unsupported platform: ' + sys.platform)
 
@@ -111,6 +108,8 @@ def extract_zip(data: BytesIO, path: Path) -> None:
     logger.info('Beginning extraction')
     if current_platform() == 'mac':
         import subprocess
+        import shutil
+
         zip_path = path / 'chrome.zip'
         if not path.exists():
             path.mkdir(parents=True)
